@@ -38,3 +38,19 @@ export const registerValidator = [
     
   validate,
 ];
+
+
+export const loginValidator = [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Email must be valid')
+    .normalizeEmail(),
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required'),
+  validate
+];
