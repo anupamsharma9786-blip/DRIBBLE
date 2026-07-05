@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import dns from 'dns'
 import authRouter from './routes/auth.routes.js';
+import chatRouter from './routes/chat.routes.js';
 dns.setServers(["1.1.1.1","8.8.8.8"])
 
 dotenv.config();
@@ -25,5 +26,6 @@ app.use(morgan('dev'));
 
 
 app.use("/api/auth",authRouter)
+app.use("/api/chats",chatRouter)
 
 export default app;
