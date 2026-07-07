@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useChat } from '../hooks/useChat'
 import { useEffect } from 'react'
-import { MessageCircle, Plus, Settings, HelpCircle, Search, Send, Paperclip } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { MessageCircle, Plus, Settings, HelpCircle, Send, Paperclip } from 'lucide-react'
 
 const Dashboard = () => {
   
@@ -20,6 +22,7 @@ const Dashboard = () => {
 
     useEffect(()=>{
       chat.initSocketConnection()
+      chat.handleGetChats()
     },[])
 
     const user = useSelector((state) => state.auth.user) 
@@ -53,6 +56,10 @@ const Dashboard = () => {
       setInputValue('')
     }
 
+    const openChat = (chatId)=>{
+      chat.handleOpenChat(chatId)
+    }
+
   return (
     <main className='h-screen w-full flex bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white'>
       
@@ -77,13 +84,24 @@ const Dashboard = () => {
         </div>
 
         {/* Chat History */}
-        <div className='flex-1 overflow-y-auto px-3 py-4'>
-          <h3 className='text-xs font-bold text-slate-400 tracking-wider mb-4 px-2'>CHAT HISTORY</h3>
+        <div className='flex-1 overflow-y-auto px-3 py-4 custom-scroll'>
+          <div className='mb-4 rounded-xl border border-slate-800/80 bg-slate-800/40 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'>
+            <h3 className='text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400'>Chat History</h3>
+          </div>
           <div className='space-y-2'>
-            {chatHistory.map((chat) => (
-              <div key={chat._id} className='group p-3 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors duration-200'>
-                <p className='text-sm text-slate-200 truncate group-hover:text-white transition-colors'>{chat.title || 'New Chat'}</p>
-                <p className='text-xs text-slate-500 mt-1'>{formatChatDate(chat.createdAt)}</p>
+            {Object.values(chats).map((chat) => (
+              <div key={chat.chatId} className='group rounded-xl border border-slate-800/70 bg-slate-900/70 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-200 hover:border-blue-500/40 hover:bg-slate-800/80'>
+                <button
+                  className='w-full text-left text-sm text-slate-200 transition-colors duration-200 group-hover:text-white'
+                  onClick={() => {
+                    openChat(chat.chatId)
+                  }}
+                  key={chat.chatId}
+                  type='button'
+                >
+                  <span className='block truncate'>{chat.title || 'New Chat'}</span>
+                </button>
+                <p className='mt-1 text-xs text-slate-500'>{formatChatDate(chat.updatedAt)}</p>
               </div>
             ))}
           </div>
@@ -111,21 +129,31 @@ const Dashboard = () => {
       <div className='flex-1 flex flex-col'>
         
         {/* CHAT AREA */}
-        <div className='flex-1 overflow-y-auto p-8'>
-          <div className='max-w-4xl mx-auto space-y-6'>
-            {chats[currentChatId]?.messages.map((msg, index) => {
-              const isUserMessage = msg.role === 'User'
+        <div className='flex-1 overflow-y-auto p-8 custom-scroll'>
+          <div className='mx-auto max-w-4xl rounded-3xl border border-slate-800/80 bg-slate-900/35 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_20px_45px_rgba(2,8,23,0.35)] backdrop-blur-sm'>
+            <div className='mb-4 rounded-2xl border border-slate-800/70 bg-slate-800/40 px-4 py-3'>
+              <p className='text-sm font-medium text-slate-300'>Current Conversation</p>
+            </div>
+            <div className='space-y-6'>
+              {chats[currentChatId]?.messages.map((msg, index) => {
+                const isUserMessage = msg.role === 'User'
 
-              return (
-                <div key={msg._id || `${msg.role}-${index}`} className={`flex gap-4 ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
-                  
-                  <div className={`max-w-2xl ${isUserMessage ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-slate-800/50 border border-slate-700/50'} rounded-2xl p-4 shadow-lg`}>
-                    <p className='text-slate-200 leading-relaxed whitespace-pre-wrap'>{msg.content}</p>
-                    <p className='text-xs text-slate-500 mt-2'>{formatMessageTime(msg.createdAt)}</p>
+                return (
+                  <div key={msg._id || `${msg.role}-${index}`} className={`flex gap-4 ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-2xl ${isUserMessage ? 'bg-blue-600/25 border border-blue-500/40' : 'bg-slate-800/70 border border-slate-700/70'} rounded-2xl p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
+                      {isUserMessage ? (
+                        <p className='leading-relaxed text-slate-200 whitespace-pre-wrap'>{msg.content}</p>
+                      ) : (
+                        <div className='prose prose-invert max-w-none text-slate-200 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-code:bg-slate-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-amber-300 prose-pre:bg-slate-900 prose-pre:p-3 prose-pre:rounded-lg prose-a:text-blue-400 prose-a:underline'>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        </div>
+                      )}
+                      <p className='mt-2 text-xs text-slate-500'>{formatMessageTime(msg.createdAt)}</p>
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
 

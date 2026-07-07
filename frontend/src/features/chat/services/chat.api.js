@@ -21,7 +21,7 @@ export const getChats = async ()=>{
 
 export const getMessages = async (chatId)=>{
     const response = await api.get(`/api/chats/${chatId}/messages`)
-
+   
     return response.data
 }
 

@@ -73,13 +73,15 @@ export async function getMessages(req, res) {
         user: userId
     })
 
+    console.log(chatId)
+
     if(!chat){
         return res.status(404).json({
             message: "chat not found"
         })
     }
 
-    const messages  = await chatModel.find({chat: chatId})
+    const messages  = await messageModel.find({chat: chatId})
     
     return res.status(200).json({
         message: "Messages fetched successfully",
