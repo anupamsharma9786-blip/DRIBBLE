@@ -140,11 +140,11 @@ const Dashboard = () => {
 
                 return (
                   <div key={msg._id || `${msg.role}-${index}`} className={`flex gap-4 ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-2xl ${isUserMessage ? 'bg-blue-600/25 border border-blue-500/40' : 'bg-slate-800/70 border border-slate-700/70'} rounded-2xl p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
+                    <div className={`max-w-2xl ${isUserMessage ? 'bg-blue-600/25  border-none' : ''} rounded-2xl p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]`}>
                       {isUserMessage ? (
                         <p className='leading-relaxed text-slate-200 whitespace-pre-wrap'>{msg.content}</p>
                       ) : (
-                        <div className='prose prose-invert max-w-none text-slate-200 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-code:bg-slate-900 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-amber-300 prose-pre:bg-slate-900 prose-pre:p-3 prose-pre:rounded-lg prose-a:text-blue-400 prose-a:underline'>
+                        <div >
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                         </div>
                       )}
