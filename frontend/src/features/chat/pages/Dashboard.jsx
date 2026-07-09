@@ -165,7 +165,7 @@ const Dashboard = () => {
                 <button className='text-slate-400 hover:text-slate-200 transition-colors p-2 rounded hover:bg-slate-700/30'>
                   <Paperclip size={20} />
                 </button>
-                <input
+                <textarea
                   type='text'
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
